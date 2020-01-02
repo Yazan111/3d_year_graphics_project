@@ -1,3 +1,1 @@
-﻿  Source.cpp
-c:\users\yazan\desktop\graphics_project\test\source.cpp(1152): warning C4838: conversion from 'int' to 'BYTE' requires a narrowing conversion
-  Test.vcxproj -> C:\Users\Yazan\Desktop\graphics_project\Debug\Test.exe
+﻿  Test.vcxproj -> C:\Users\Yazan\Desktop\graphics_project\Debug\Test.exe

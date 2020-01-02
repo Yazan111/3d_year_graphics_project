@@ -25,7 +25,7 @@ void SecondLandDraw();
 void Park();
 void Mal();
 void Buildings();
-void CameraMode();
+void processInput();
 
 void Park();
 HDC			hDC = NULL;		// Private GDI Device Context
@@ -44,7 +44,8 @@ bool firstMouse = true;
 // box and land size
 GLfloat Size = 50;
 GLfloat LandSize = -Size / 2 + 10;
-Camera camera(glm::vec3(2.0f, LandSize + 1.1, 2.0f));
+Camera camera(glm::vec3(2.0f, LandSize + 1.1, 2.0f), LandSize + 1.9);
+Camera camera2(glm::vec3(-33.0f, LandSize + 1.10, -33.0f), LandSize + 20);
 
 // timing
 float deltaTime = 0.1f;	
@@ -107,6 +108,16 @@ Model_3DS *grass_block;
 Model_3DS *House; 
 Model_3DS *House_1;
 
+// sun light
+GLfloat sunLightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f }; 
+GLfloat sunLightPosition[]= { 0.0f, LandSize + 20.0f, 2.0f, 1.0f }; 
+
+// person light
+// person light
+GLfloat personLightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
+GLfloat personLightSpecular[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
+GLfloat shiness[] = { 50.0f };
+// person light position will be related to camera
 
 void TextureLoading() { //Skybox
 	front = LoadTexture((char*)"Photos\\SkyBoxLand\\front.bmp");
@@ -250,7 +261,23 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 														//our Enable
-														// Initialization Went OK
+
+	// lighting 
+
+	// sunglight
+	glLightfv(GL_LIGHT1, GL_AMBIENT, sunLightAmbient); 
+	glLightfv(GL_LIGHT1, GL_POSITION, sunLightPosition); 
+	glEnable(GL_LIGHT1); 
+
+	// person light
+	glEnable(GL_LIGHT2); 
+	glLightfv(GL_LIGHT2, GL_SPECULAR, personLightSpecular); 
+
+	glMaterialfv(GL_FRONT, GL_SHININESS, shiness);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, personLightSpecular);
+	glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 2.0);
+	glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 1.0);
+	glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.5);
 
 	glEnable(GL_TEXTURE_2D);
 	TextureLoading();
@@ -261,9 +288,10 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 //For Camera
 
 
-void CameraMode()
+void processInput()
 {
 
+	// camera
 	if (keys['A'])
 	{
         camera.ProcessKeyboard(LEFT, deltaTime);
@@ -279,6 +307,25 @@ void CameraMode()
 	if (keys['W'])
 	{
         camera.ProcessKeyboard(FORWARD, deltaTime);
+	}
+
+	// lighting 
+	if (keys['L']) 
+	{
+		glEnable(GL_LIGHTING);
+	}
+	if (keys['K']) 
+	{
+		glDisable(GL_LIGHTING);
+	}
+	if (keys['I']) 
+	{
+		glLoadMatrixf(glm::value_ptr(camera2.GetViewMatrix()));
+	}
+
+	if (keys['U']) 
+	{
+		glLoadMatrixf(glm::value_ptr(camera.GetViewMatrix()));
 	}
 
 }
@@ -391,6 +438,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
+	glNormal3f( 0.0f, 0.0f, -1.0f); 
 	glTexCoord2f(1, 1);
 	glVertex3f(size, size, -size);
 
@@ -410,6 +458,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
+	glNormal3f( 0.0f, 0.0f, 1.0f); 
 	glTexCoord2f(0, 0);
 	glVertex3f(size, -size, size);
 
@@ -429,6 +478,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
+	glNormal3f( -1.0f, 0.0f, 0.0f); 
 	glTexCoord2f(0, 0);
 	glVertex3f(-size, -size, size);
 
@@ -449,6 +499,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
+	glNormal3f( 1.0f, 0.0f, 0.0f); 
 	glTexCoord2f(0, 0);
 	glVertex3f(size, -size, -size);
 
@@ -467,6 +518,8 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	//Top face
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
+
+	glNormal3f( 0.0f, 1.0f, 0.0f); 
 	glTexCoord2f(1, 0);
 	glVertex3f(size, size, size);
 
@@ -485,6 +538,8 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	//Down face
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
+
+	glNormal3f( 0.0f, -1.0f, 0.0f); 
 	glTexCoord2f(0, 1);
 	glVertex3f(size, -size, size);
 
@@ -963,8 +1018,14 @@ void DrawGLScene(GLvoid)								   	// Here's Where We Do All The Drawing
 	glMatrixMode(GL_MODELVIEW);
 	glm::mat4 view = camera.GetViewMatrix();
 	glLoadMatrixf(glm::value_ptr(view));
-	CameraMode();
+	processInput();
 	// Camera
+
+	// lighting 
+	glm::vec3 cameraPosition = camera.GetCameraPosition();
+	GLfloat personLightPosition[] = {2 + cameraPosition.x,2+  cameraPosition.y, 2 + cameraPosition.z, 0.0f};
+	glLightfv(GL_LIGHT2, GL_POSITION, personLightPosition); 
+	// lighting 
 
 	for (GLfloat i = 47 ; i>-50; i -= 2)
 		CreatModel(Street_Model, 20.0f, 0.0f, i, 0.5f);
@@ -987,7 +1048,6 @@ void DrawGLScene(GLvoid)								   	// Here's Where We Do All The Drawing
 
 	SwapBuffers(hDC);	//DO NOT REMOVE THIS
 }
-
 GLvoid KillGLWindow(GLvoid)								// Properly Kill The Window
 {
 	if (fullscreen)										// Are We In Fullscreen Mode?
