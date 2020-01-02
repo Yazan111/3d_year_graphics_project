@@ -351,11 +351,11 @@ void Skybox(int size) {
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 0);
 	glVertex3f(size, size, size);
-	glTexCoord2f(1, 0);
+	glTexCoord2f(0, 1);
 	glVertex3f(-size, size, size);
 	glTexCoord2f(1, 1);
 	glVertex3f(-size, size, -size);
-	glTexCoord2f(0, 1);
+	glTexCoord2f(1, 0);
 	glVertex3f(size, size, -size);
 	glEnd();
 
@@ -979,7 +979,7 @@ void DrawGLScene(GLvoid)								   	// Here's Where We Do All The Drawing
 	
 	Skybox(Size);
 
-	Land(-Size,-Size , +Size, +Size, downLand,30);
+	//Land(-Size,-Size , +Size, +Size, downLand,30);
 	SecondLandDraw();
 
 	Park();
