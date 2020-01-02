@@ -1,13 +1,12 @@
 #include <windows.h>		// Header File For Windows
 #include <gl\gl.h>			// Header File For The OpenGL32 Library
+#include <glm/gtc/type_ptr.hpp>
 
 #include "texture.h"
 #include "gltexture.h"
 #include "Model_3DS.h"
 #include "Camera.h"
 #include <math.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <time.h>
 
 void scroll_callback(double xoffset, double yoffset);
 void mouse_callback(double xpos, double ypos);
@@ -40,17 +39,17 @@ bool	keys[256];			// Array Used For The Keyboard Routine
 bool	active = TRUE;		// Window Active Flag Set To TRUE By Default
 bool	fullscreen = FALSE;	// Fullscreen Flag Set To Fullscreen Mode By Default
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = 800 / 2.0f;
 float lastY = 600 / 2.0f;
 bool firstMouse = true;
 
 // box and land size
-double Size = 50;
-double LandSize = -Size / 2 + 10;
+extern double Size = 50;
+extern double LandSize = -Size / 2 + 10;
+Camera camera(glm::vec3(2.0f, LandSize + 1.1, 2.0f));
 
 // timing
-float deltaTime = 0.2f;	
+float deltaTime = 0.1f;	
 
 LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);	// Declaration For WndProc
 
@@ -812,7 +811,7 @@ void Buildings() {
 	int BuildSize = Size / 15;
 
 	build(BuildSize, 75, 25, 1, 4.5, 1, Building_1[0]);
-	build(BuildSize, 85, 30, 1, 6.1, 1, Building_1[1]);
+	build(BuildSize, 85, 30, 3, 6.1, 2, Building_1[1]);
 	build(BuildSize, 75, 35, 1, 3.4, 2, Building_1[3]);
     
 	build(BuildSize, 82, 60, 2, 4.1, 1, Building_1[4]);
@@ -1322,7 +1321,7 @@ void mouse_callback(double xpos, double ypos)
         firstMouse = false;
     }
 
-    float xoffset = (xpos - lastX) * 6;
+    float xoffset = (xpos - lastX) * 7;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
     lastX = xpos;
