@@ -8,17 +8,15 @@
 #include "Camera.h"
 #include <math.h>
 
-void scroll_callback(double xoffset, double yoffset);
-void mouse_callback(double xpos, double ypos);
+void mouse_callback(GLfloat xpos, GLfloat ypos);
 void CreatModel(Model_3DS *Model, float x, float y, float z, float scale);
-void Land(float x1, float z1, float x2, float z2, int Texture, int n); //
-void Wall(float size, float sx, float sy, float sz, float alpha, int texture, int n);
+void Land(float x1, float z1, float x2, float z2, int Texture, GLfloat n); //
+void Wall(float size, float sx, float sy, float sz, float alpha, int texture, GLfloat n);
 void Road(float x, float z, int Texture);
 void Road2(float x1, float z1, float x2, float z2, int Texture);
-void build(int size, int x, int z, int width, int length, int Depth, int texture);
-void Skybox(int size);
-void mouse_callback(double xpos, double ypos);
-void scroll_callback(double xoffset, double yoffset);
+void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GLfloat Depth, int texture);
+void Skybox(GLfloat size);
+void scroll_callback(GLfloat xoffset, GLfloat yoffset);
 
 void ModelLoading();
 void TextureLoading();
@@ -44,8 +42,8 @@ float lastY = 600 / 2.0f;
 bool firstMouse = true;
 
 // box and land size
-extern double Size = 50;
-extern double LandSize = -Size / 2 + 10;
+GLfloat Size = 50;
+GLfloat LandSize = -Size / 2 + 10;
 Camera camera(glm::vec3(2.0f, LandSize + 1.1, 2.0f));
 
 // timing
@@ -73,26 +71,26 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 }
 
 //For SkyBox
-int top;
-int front;
-int back;
-int down;
-int right;
-int left;
+int  top;
+int  front;
+int  back;
+int  down;
+int  right;
+int  left;
 
-int tranwall;
-int yellowwall;
-int whitewall;
-int blackwall;
-int redwall;
+int  tranwall;
+int  yellowwall;
+int  whitewall;
+int  blackwall;
+int  redwall;
 
-int Sidewalk;
-int downLand;
-int ParkLand;
+int  Sidewalk;
+int  downLand;
+int  ParkLand;
 
-int Building_1[6];
-int SecondLand;
-int mallRoad;
+GLint Building_1[6];
+GLint SecondLand;
+GLint mallRoad;
 
 Model_3DS * TreeModel;
 Model_3DS *Hydrant;
@@ -284,7 +282,7 @@ void CameraMode()
 	}
 
 }
-void Skybox(int size) {
+void Skybox(GLfloat size) {
 	glColor3d(1, 1, 1);
 	glBindTexture(GL_TEXTURE_2D, back);
 	glBegin(GL_QUADS);
@@ -377,7 +375,7 @@ void Skybox(int size) {
 
 }
 
-void build(int size, int x, int z, int width, int length, int Depth,int texture)
+void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GLfloat Depth, int texture)
 {
 
 	glEnable(GL_TEXTURE_2D);
@@ -512,16 +510,16 @@ void Road2(float x1, float z1, float x2, float z2, int Texture) {
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0, 10);
-	glVertex3f(x1, LandSize + 0.1, z1);
+	glVertex3f(x1, LandSize + 0.1f, z1);
 
 	glTexCoord2f(0, 0);
-	glVertex3f(x2, LandSize + 0.1, z1);
+	glVertex3f(x2, LandSize + 0.1f, z1);
 
 	glTexCoord2f(10, 0);
-	glVertex3f(x2, LandSize + 0.1, z2);
+	glVertex3f(x2, LandSize + 0.1f, z2);
 
 	glTexCoord2f(10, 10);
-	glVertex3f(x1, LandSize + 0.1, z2);
+	glVertex3f(x1, LandSize + 0.1f, z2);
 
 	glEnd();
 
@@ -536,18 +534,18 @@ void Road(float x, float z, int Texture)
 	glBegin(GL_POLYGON);
 
 	glTexCoord2d(0, 0);
-	glVertex3f(x, LandSize + 0.1, 0.0);
+	glVertex3f(x, LandSize + 0.1f, 0.0);
 
 	glTexCoord2d(1, 0);
-	glVertex3f(-x, LandSize + 0.1, 0.0);
+	glVertex3f(-x, LandSize + 0.1f, 0.0);
 
 
 	glTexCoord2d(1, 1);
-	glVertex3f(-x, LandSize + 0.1, z);
+	glVertex3f(-x, LandSize + 0.1f, z);
 
 
 	glTexCoord2d(0, 1);
-	glVertex3f(x, LandSize + 0.1, z);
+	glVertex3f(x, LandSize + 0.1f, z);
 
 
 	glEnd();
@@ -555,7 +553,7 @@ void Road(float x, float z, int Texture)
 }
 
 
-void Wall(float size, float sx, float sy, float sz, float alpha, int texture, int n) {
+void Wall(float size, float sx, float sy, float sz, float alpha, int texture, GLfloat n) {
 
 	glPushMatrix();
 	glTranslated(0, -15 + sy, 0);
@@ -649,40 +647,40 @@ void Mal() {
 	//////////////////////////////////////////////////right market
 	glPushMatrix();
 	glTranslatef(-16, 0, -5);
-	for (int i = 0; i <= 12; i += 4) {
+	for (GLfloat i = 0; i <= 12; i += 4) {
 		glPushMatrix();
 		glTranslatef(i, 0, 0);
-		Wall(1.0, 3.0, 3.0, 0.2, 90, blackwall, 1);
+		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
 		glPopMatrix();
 	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(-16, 0, 5);
-	for (int i = 0; i <= 12; i += 4) {
+	for (GLfloat i = 0; i <= 12; i += 4) {
 		glPushMatrix();
 		glTranslatef(i, 0, 0);
-		Wall(1.0, 3.0, 3.0, 0.2, 90, blackwall, 1);
+		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
 		glPopMatrix();
 	}
 	glPopMatrix();
 	///////////////////////////////////////////////////// left market
 	glPushMatrix();
 	glTranslatef(16, 0, -5);
-	for (int i = 0; i <= 12; i += 4) {
+	for (GLfloat i = 0; i <= 12; i += 4) {
 		glPushMatrix();
 		glTranslatef(-i, 0, 0);
-		Wall(1.0, 3.0, 3.0, 0.2, 90, blackwall, 1);
+		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
 		glPopMatrix();
 	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(16, 0, 5);
-	for (int i = 0; i <= 12; i += 4) {
+	for (GLfloat i = 0; i <= 12; i += 4) {
 		glPushMatrix();
 		glTranslatef(-i, 0, 0);
-		Wall(1.0, 3.0, 3.0, 0.2, 90, blackwall, 1);
+		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
 		glPopMatrix();
 	}
 	glPopMatrix();
@@ -692,43 +690,43 @@ void Mal() {
 
 
 	glPushMatrix();                          //down wall
-	glTranslatef(0, -15.2, 7);
-	glRotatef(90, 1, 0, 0);
-	Wall(1.0, 20.0, 8.0, 0.2, 0, whitewall, 5);
+	glTranslatef(0.0f, -15.2f, 7.0f);
+	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+	Wall(1.0f, 20.0f, 8.0f, 0.2f, 0.0f, whitewall, 5.0f);
 	glPopMatrix();
 
 	glPushMatrix();                             // up wall 2
-	glTranslatef(0, -3.2, 7);
-	glRotatef(90, 1, 0, 0);
-	Wall(1.0, 20.0, 8.0, 0.2, 0, blackwall, 5);
+	glTranslatef(0.0f, -3.2f, 7.0f);
+	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+	Wall(1.0f, 20.0f, 8.0f, 0.2f, 0.0f, blackwall, 5.0f);
 	glPopMatrix();
 
 	glPushMatrix();                             // up wall 1
-	glTranslatef(0, -9.2, 7);
-	glRotatef(90, 1, 0, 0);
-	Wall(1.0, 20.0, 8.0, 0.2, 0, blackwall, 5);
+	glTranslatef(0.0f, -9.2f, 7.0f);
+	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+	Wall(1.0f, 20.0f, 8.0f, 0.2f, 0.0f, blackwall, 5.0f);
 	glPopMatrix();
 
 	glPushMatrix();                                 //front wall
-	glTranslatef(0, 0, +8);
-	Wall(1.0, 20.0, 6.0, 0.2, 0, tranwall, 5);
+	glTranslatef(0.0f, 0.0f, 8.0f);
+	Wall(1.0f, 20.0f, 6.0f, 0.2f, 0.0f, tranwall, 5.0f);
 	glPopMatrix();
 
 
 	glPushMatrix();                                 //right wall
-	glTranslatef(-20, 0, 0);
-	Wall(1.0, 8.0, 6.0, 0.2, 90, tranwall, 5);
+	glTranslatef(-20.0f, 0.0f, 0.0f);
+	Wall(1.0f, 8.0f, 6.0f, 0.2f, 90.0f, tranwall, 5.0f);
 	glPopMatrix();
 
 
 	glPushMatrix();                                    //left wall
-	glTranslatef(+20, 0, 0);
-	Wall(1.0, 8.0, 6.0, 0.2, 90, tranwall, 5);
+	glTranslatef(+20.0f, 0.0f, 0.0f);
+	Wall(1.0f, 8.0f, 6.0f, 0.2f, 90.0f, tranwall, 5.0f);
 	glPopMatrix();
 
 
 	//glPushMatrix();                                   //back wall
-	glTranslatef(0, 0, -8);
+	glTranslatef(0.0f, 0.0f, -8.0f);
 	// 
 	//glPushMatrix();                                   //right back wall
 	//glTranslatef(-11.7,0,0);
@@ -736,13 +734,13 @@ void Mal() {
 	//glPopMatrix();
 	//
 	glPushMatrix();                                   //right column
-	glTranslatef(-3,0,0);
-	Wall(1.0, 1.5, 7.0, 1.0, 0, tranwall,5);
+	glTranslatef(-3.0f ,0.0f ,0.0f);
+	Wall(1.0f, 1.5f, 7.0f, 1.0f, 0.0f, tranwall,5.0f);
 	glPopMatrix();
 	
 	glPushMatrix();                                  //left column
-	glTranslatef(+3, 0, 0);
-	Wall(1.0, 1.5, 7.0, 1.0, 0, tranwall,5);
+	glTranslatef(+3.0f, 0.0f, 0.0f);
+	Wall(1.0f, 1.5f, 7.0f, 1.0f, 0.0f, tranwall, 5.0f);
 	glPopMatrix();
 	//
 	//
@@ -755,8 +753,8 @@ void Mal() {
 
 	//road of mal
 	glPushMatrix();
-	glTranslatef(-0.5, 0, -23.0);
-	Road(2, 15.0, mallRoad);
+	glTranslatef(-0.5f, 0.0f, -23.0f);
+	Road(2.0f, 15.0f, mallRoad);
 	glPopMatrix();
 	/*
 	glPushMatrix();
@@ -773,7 +771,7 @@ void Mal() {
 	glPopMatrix();                                     //finall
 }
 
-void Land(float x1, float z1, float x2, float z2,int Texture,int n) {
+void Land(float x1, float z1, float x2, float z2,int Texture,GLfloat n) {
 
 	glBindTexture(GL_TEXTURE_2D, Texture);
 	//glScalef(x, 1, z);
@@ -808,15 +806,16 @@ void CreatModel(Model_3DS *Model, float x, float y, float z, float scale)
 
 void Buildings() {
 
-	int BuildSize = Size / 15;
+	GLfloat BuildSize = Size / 15;
 
-	build(BuildSize, 75, 25, 1, 4.5, 1, Building_1[0]);
-	build(BuildSize, 85, 30, 3, 6.1, 2, Building_1[1]);
-	build(BuildSize, 75, 35, 1, 3.4, 2, Building_1[3]);
+
+	build(BuildSize, 75.0f, 25.0f, 1.0f, 4.5f, 1.0f, Building_1[0]);
+	build(BuildSize, 85.0f, 30.0f, 3.0f, 6.1f, 2.0f, Building_1[1]);
+	build(BuildSize, 75.0f, 35.0f, 1.0f, 3.4f, 2.0f, Building_1[3]);
     
-	build(BuildSize, 82, 60, 2, 4.1, 1, Building_1[4]);
-	build(BuildSize, 78, 70, 2, 7.2, 2, Building_1[5]);
-	build(BuildSize, 80, 90, 2, 5.5, 1, Building_1[1]);
+	build(BuildSize, 82.0f, 60.0f, 2.0f, 4.1f, 1.0f, Building_1[4]);
+	build(BuildSize, 78.0f, 70.0f, 2.0f, 7.2f, 2.0f, Building_1[5]);
+	build(BuildSize, 80.0f, 90.0f, 2.0f, 5.5f, 1.0f, Building_1[1]);
 
 }
 
@@ -830,103 +829,103 @@ void Park()
 
 	CreatModel(SLIDING_ZOOLA, -30, -2, -10	, 0.5);
 	
-	CreatModel(city_stall, -5, 0, -1, 0.01);
+	CreatModel(city_stall, -5.0f, 0.0f, -1.0f, 0.01f);
 
-    for (int i = 4; i <	20; i += 4)
-       CreatModel(TreeModel, -3,0, i, 0.04);
+    for (GLfloat i = 4; i <	20; i += 4)
+       CreatModel(TreeModel, -3.0f, 0.0f, i, 0.04f);
 
-	for (int i = 4; i < 20; i += 4)
-		CreatModel(TreeModel, 3, 0, i, 0.04);
+	for (GLfloat i = 4; i < 20; i += 4)
+		CreatModel(TreeModel, 3.0f, 0.0f, i, 0.04f);
 	
-	for (int i = -5; i > -35; i -= 4)
-		CreatModel(TreeModel, i,0, 16, 0.1);
+	for (GLfloat i = -5; i > -35; i -= 4)
+		CreatModel(TreeModel, i, 0.0f, 16.0f, 0.1f);
 
-	for (int i = 5; i<30; i += 4)
-		CreatModel(TreeModel, i, 0,16, 0.1);
+	for (GLfloat i = 5; i<30; i += 4)
+		CreatModel(TreeModel, i, 0.0f, 16.0f, 0.1f);
 
-	for (int i = 5; i<26; i += 4)
-		CreatModel(TreeModel, i,0, -19, 0.1);
+	for (GLfloat i = 5; i<26; i += 4)
+		CreatModel(TreeModel, i, 0.0f, -19.0f, 0.1f);
 	
 
-	for (int i = -4 ; i>-33; i -= 4)
-		CreatModel(TreeModel, i,0, -19, 0.1);
+	for (GLfloat i = -4 ; i>-33; i -= 4)
+		CreatModel(TreeModel, i, 0.0f, -19.0f, 0.1f);
 
 	Land(-37,-21,33,18,ParkLand,30);
 	
-	for( float i=-33.5 ; i<-7 ; i+=6.5)
-    CreatModel(fence, i,0, 17, 0.04);
+	for(GLfloat i = -33.5 ; i<-7 ; i+=6.5)
+    CreatModel(fence, i, 0.0f, 17.0f, 0.04f);
 
 
-	for (float i = 27.5; i>2; i -= 6.5)
-		CreatModel(fence, i,0, 17, 0.04);
+	for (GLfloat i = 27.5; i>2; i -= 6.5)
+		CreatModel(fence, i, 0.0f, 17.0f, 0.04f);
 
 
-	CreatModel(grass_block, 30, -0.2, 17, 0.04);
+	CreatModel(grass_block, 30.0f, -0.2f, 17.0f, 0.04f);
 
-	CreatModel(grass_block,  2.2	, -0.2, 17, 0.04);
-	CreatModel(grass_block, -3.2, -0.2, 17, 0.04);
+	CreatModel(grass_block,  2.2f, -0.2f, 17.0f, 0.04f);
+	CreatModel(grass_block, -3.2f, -0.2f, 17.0f, 0.04f);
 
 	Road2(-2.5, -21, 1.5, 18, Sidewalk);
 
 	
-	for (float i = -34; i < -4; i += 8)
+	for (GLfloat i = -34; i < -4; i += 8)
 	{
-		CreatModel(Wood_Bench, i, 0.3, -1, 0.005);
-		CreatModel(TreeModel,  i, 0  , -3,  0.05);
+		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
+		CreatModel(TreeModel,  i, 0.0f, -3.0f,  0.05f);
 
 	}
-	for (float i = 4; i < 34; i += 8)
+	for (GLfloat i = 4; i < 34; i += 8)
 	{
-		CreatModel(Wood_Bench, i, 0.3, -1, 0.005);
-		CreatModel(TreeModel,  i, 0, -3, 0.05);
+		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
+		CreatModel(TreeModel,  i, 0.0f, -3.0f, 0.05f);
 	}
 	glPushMatrix();
-	glRotated(180, 0, 1, 0);
+	glRotated(180.0f, 0.0f, 1.0f, 0.0f);
 
-	for (float i = 12; i < 34; i += 8)
+	for (GLfloat i = 12; i < 34; i += 8)
 	{
-		CreatModel(Wood_Bench, i, 0.3, -1, 0.005);
-		CreatModel(TreeModel,  i, 0, -3, 0.05);
+		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
+		CreatModel(TreeModel,  i, 0.0f, -3.0f, 0.05f);
 	}
-	for (float i = -10; i > -30; i -= 8)
+	for (GLfloat i = -10; i > -30; i -= 8)
 	{
-		CreatModel(Wood_Bench, i, 0.3, -1, 0.005);
-		CreatModel(TreeModel, i, 0, -3, 0.05);
+		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
+		CreatModel(TreeModel, i, 0.0f, -3.0f, 0.05f);
 	}
 	glPopMatrix();
 	glPushMatrix();
-	glRotated(90, 0, 1, 0);
+	glRotated(90.0f, 0.0f, 1.0f, 0.0f);
 	
 
-    for (int i = -14; i < 21; i += 8)
-    	CreatModel(TreeModel, i, 0, 30, 0.1);
+    for (GLfloat i = -14; i < 21; i += 8)
+    	CreatModel(TreeModel, i, 0.0f, 30.0f, 0.10f);
 	
 
-	for (float i = -14; i<21; i += 6.5)
-		CreatModel(fence, i, 0,31, 0.04);
+	for (GLfloat i = -14; i<21; i += 6.5)
+		CreatModel(fence, i, 0.0f, 31.0f, 0.04f);
 	
-	 for (int i = 5; i < 30; i += 4)
-		CreatModel(TreeModel, i, 0, -36, 0.1);
+	 for (GLfloat i = 5; i < 30; i += 4)
+		CreatModel(TreeModel, i, 0.0f, -36.0f, 0.1f);
 	
 
-     for (int i = -4; i > -15; i -= 4)
-     		CreatModel(TreeModel, i, 0, -36, 0.1);
+     for (GLfloat i = -4; i > -15; i -= 4)
+     		CreatModel(TreeModel, i, 0.0f, -36.0f, 0.10f);
 	
 	Road2(-2, -37, 2, -2.5, Sidewalk);
 	Road2(-2, 1.5, 2, 31, Sidewalk);
 
-	for (float i = 2; i < 20; i += 8)
+	for (GLfloat i = 2; i < 20; i += 8)
 	{
-		CreatModel(Wood_Bench, i, 0.3, -2, 0.005);
-		CreatModel(TreeModel, i, 0, -3, 0.05);
+		CreatModel(Wood_Bench, i, 0.3f, -2.0f, 0.005f);
+		CreatModel(TreeModel, i, 0.0f, -3.0f, 0.05f);
 	}
 
 	glPushMatrix();
-	glRotated(180, 0, 1, 0);
-	for (float i = -6; i > -20; i -= 8)
+	glRotated(180.0f, 0.0f, 1.0f, 0.0f);
+	for (GLfloat i = -6; i > -20; i -= 8)
 	{
-		CreatModel(Wood_Bench, i, 0.3, -1, 0.005);
-		CreatModel(TreeModel, i, 0, -3, 0.05);
+		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
+		CreatModel(TreeModel, i, 0.0f, -3.0f, 0.05f);
 	}
 	glPopMatrix();
 
@@ -960,26 +959,26 @@ void DrawGLScene(GLvoid)								   	// Here's Where We Do All The Drawing
 	POINT p;
 	GetPhysicalCursorPos(&p);
 	ShowCursor(false);
-	mouse_callback(p.x, p.y);
+	mouse_callback((GLfloat)p.x, (GLfloat)p.y);
 	glMatrixMode(GL_MODELVIEW);
 	glm::mat4 view = camera.GetViewMatrix();
 	glLoadMatrixf(glm::value_ptr(view));
 	CameraMode();
 	// Camera
 
-	for (int i = 47 ; i>-50; i -= 2)
-		CreatModel(Street_Model, 20,0, i, 0.5);
+	for (GLfloat i = 47 ; i>-50; i -= 2)
+		CreatModel(Street_Model, 20.0f, 0.0f, i, 0.5f);
 
 	glPushMatrix();
-		glRotated(90, 0, 1, 0);
-		glTranslated(0, 0, 0.8);
-		for (int  i = 16; i>-49; i -= 2)
-			CreatModel(Street_Model, 10, 0,i, 0.5);
+		glRotated(90.0f, 0.0f, 1.0f, 0.0f);
+		glTranslated(0.0f, 0.0f, 0.8f);
+		for (GLfloat i = 16; i>-49; i -= 2)
+			CreatModel(Street_Model, 10.0f, 0.0f ,i, 0.5f);
 	glPopMatrix();
 	
 	Skybox(Size);
 
-	//Land(-Size,-Size , +Size, +Size, downLand,30);
+	Land(-Size,-Size , +Size, +Size, downLand,30);
 	SecondLandDraw();
 
 	Park();
@@ -1312,7 +1311,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 
 }
 
-void mouse_callback(double xpos, double ypos)
+void mouse_callback(GLfloat xpos, GLfloat ypos)
 {
     if (firstMouse)
     {
@@ -1330,7 +1329,7 @@ void mouse_callback(double xpos, double ypos)
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-void scroll_callback(double xoffset, double yoffset)
+void scroll_callback(GLfloat xoffset, GLfloat yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }

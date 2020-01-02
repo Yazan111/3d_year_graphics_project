@@ -62,7 +62,7 @@ public:
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
-		Position.y = (-50.0 / 2) + 11.9;
+		Position.y = (-50.0 / 2) + 11.9f;
         return glm::lookAt(Position, Position + Front, Up);
     }
 
