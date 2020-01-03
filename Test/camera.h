@@ -72,10 +72,17 @@ public:
     }
 
     // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
-	glm::vec3 GetCameraPosition() {
+	glm::vec3 GetCameraDirection() {
 
 		Position.y = Height;
 		return -(Position + Front);
+	}
+
+	glm::vec3 GetCameraPosition() {
+
+		Position.y = Height;
+		return Position;
+
 	}
 
     glm::mat4 GetViewMatrix()

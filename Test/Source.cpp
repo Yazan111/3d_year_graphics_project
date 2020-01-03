@@ -1,4 +1,4 @@
-#include <windows.h>		// Header File For Windows
+#include <windows.h>		// Header GL_EXPFile For Windows
 #include <gl\gl.h>			// Header File For The OpenGL32 Library
 #include <glm/gtc/type_ptr.hpp>
 
@@ -111,13 +111,11 @@ Model_3DS *House_1;
 // sun light
 GLfloat sunLightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f }; 
 GLfloat sunLightPosition[]= { 0.0f, LandSize + 20.0f, 2.0f, 1.0f }; 
+GLboolean darkMode = false;
 
-// person light
-// person light
-GLfloat personLightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
-GLfloat personLightSpecular[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
-GLfloat shiness[] = { 50.0f };
-// person light position will be related to camera
+// for fog 
+GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f}; // Fog Color
+GLboolean fog = false;
 
 void TextureLoading() { //Skybox
 	front = LoadTexture((char*)"Photos\\SkyBoxLand\\front.bmp");
@@ -262,22 +260,23 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 														//our Enable
 
-	// lighting 
 
 	// sunglight
 	glLightfv(GL_LIGHT1, GL_AMBIENT, sunLightAmbient); 
 	glLightfv(GL_LIGHT1, GL_POSITION, sunLightPosition); 
 	glEnable(GL_LIGHT1); 
+	// sunglight
 
-	// person light
-	glEnable(GL_LIGHT2); 
-	glLightfv(GL_LIGHT2, GL_SPECULAR, personLightSpecular); 
+	// fog
+	glFogi(GL_FOG_MODE, GL_EXP);
+	glFogfv(GL_FOG_COLOR, fogColor);
 
-	glMaterialfv(GL_FRONT, GL_SHININESS, shiness);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, personLightSpecular);
-	glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 2.0);
-	glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 1.0);
-	glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.5);
+	glFogf(GL_FOG_DENSITY, 0.05f); 
+	glHint(GL_FOG_HINT, GL_DONT_CARE);
+
+	glFogf(GL_FOG_START, 1.0f); 
+	glFogf(GL_FOG_END, 5.0f); 
+	// fog
 
 	glEnable(GL_TEXTURE_2D);
 	TextureLoading();
@@ -312,20 +311,35 @@ void processInput()
 	// lighting 
 	if (keys['L']) 
 	{
-		glEnable(GL_LIGHTING);
+		if (!darkMode) {
+			glEnable(GL_LIGHTING);
+			darkMode = true;
+		}
+
+		else {
+			glDisable(GL_LIGHTING);
+			darkMode = false;
+		}
 	}
-	if (keys['K']) 
-	{
-		glDisable(GL_LIGHTING);
-	}
+
+	// different camera angle
 	if (keys['I']) 
 	{
 		glLoadMatrixf(glm::value_ptr(camera2.GetViewMatrix()));
 	}
 
-	if (keys['U']) 
+	// fog
+	if (keys['F']) 
 	{
-		glLoadMatrixf(glm::value_ptr(camera.GetViewMatrix()));
+		if (!fog) {
+			glEnable(GL_FOG); // Enables GL_FOG
+			fog = true;
+		}
+
+		else {
+			glDisable(GL_FOG);
+			fog = false;
+		}
 	}
 
 }
@@ -1021,11 +1035,6 @@ void DrawGLScene(GLvoid)								   	// Here's Where We Do All The Drawing
 	processInput();
 	// Camera
 
-	// lighting 
-	glm::vec3 cameraPosition = camera.GetCameraPosition();
-	GLfloat personLightPosition[] = {2 + cameraPosition.x,2+  cameraPosition.y, 2 + cameraPosition.z, 0.0f};
-	glLightfv(GL_LIGHT2, GL_POSITION, personLightPosition); 
-	// lighting 
 
 	for (GLfloat i = 47 ; i>-50; i -= 2)
 		CreatModel(Street_Model, 20.0f, 0.0f, i, 0.5f);
