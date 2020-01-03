@@ -27,6 +27,9 @@ void Park();
 void Mal();
 void Buildings();
 void processInput();
+void allmarkets();
+void market(float x, float z, float r);
+
 
 void Park();
 HDC			hDC = NULL;		// Private GDI Device Context
@@ -49,7 +52,7 @@ Camera camera(glm::vec3(2.0f, LandSize + 1.1, 2.0f), LandSize + 1.9);
 Camera camera2(glm::vec3(-33.0f, LandSize + 1.10, -33.0f), LandSize + 20);
 
 // timing
-float deltaTime = 0.1f;	
+float deltaTime = 0.1f;
 
 LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);	// Declaration For WndProc
 
@@ -66,9 +69,9 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	glLoadIdentity();									// Reset The Projection Matrix
 
-										 				// Calculate The Aspect Ratio Of The Window
+														// Calculate The Aspect Ratio Of The Window
 	gluPerspective(45.0f, (GLfloat)width / (GLfloat)height, 2, 100000);
-	
+
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
 }
 
@@ -107,23 +110,23 @@ Model_3DS *Tree_2;
 Model_3DS *Tree_3;
 
 Model_3DS *grass_block;
-Model_3DS *House; 
+Model_3DS *House;
 Model_3DS *House_1;
 
 // moonlight
-GLfloat moonLightAmbient[]= { 0.3f, 0.3f, 0.3f, 1.0f }; 
-GLfloat moonLightDiffuse[]= { 0.3f, 0.3f, 0.3f, 1.0f }; 
-GLfloat moonLightPosition[]= { 0.0f, LandSize + 20.0f, 2.0f, 1.0f }; 
+GLfloat moonLightAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+GLfloat moonLightDiffuse[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+GLfloat moonLightPosition[] = { 0.0f, LandSize + 20.0f, 2.0f, 1.0f };
 GLboolean darkMode = false;
 
 // sunlight
 float downToTop;
-GLfloat sunLightAmbient[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
-GLfloat sunLightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
-GLfloat sunLightPosition[]= { 1.0f, LandSize + 55.0f, 0.0f, 8.0f }; 
+GLfloat sunLightAmbient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat sunLightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat sunLightPosition[] = { 1.0f, LandSize + 55.0f, 0.0f, 8.0f };
 
 // for fog 
-GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f}; // Fog Color
+GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f }; // Fog Color
 GLboolean fog = false;
 
 void TextureLoading() { //Skybox
@@ -150,7 +153,7 @@ void TextureLoading() { //Skybox
 	downLand = LoadTexture((char*)"Photos\\downLand.jpg");
 	SecondLand = LoadTexture((char*)"Photos\\ParkLand1.jpg");
 	mallRoad = LoadTexture((char*)"Photos/mall_road.jpg");
-	
+
 
 }
 
@@ -159,7 +162,7 @@ void ModelLoading() {
 
 	TreeModel = new Model_3DS();
 	TreeModel->Load("Models\\Park\\M_TREE5.3DS");
-	
+
 	GLTexture BARK, Leaf;
 	Leaf.LoadBMP("Photos\\Leaf.bmp");
 	BARK.LoadBMP("Photos\\Bark.bmp");
@@ -183,8 +186,8 @@ void ModelLoading() {
 	Street.LoadBMP("Photos/roadtexture.bmp");
 
 	Street_Model->Materials[0].tex = Street;
-	
-	
+
+
 	fence = new Model_3DS();
 	fence->Load("Models\\Park\\fence.3ds");
 
@@ -192,13 +195,13 @@ void ModelLoading() {
 	//fence_1.LoadBMP("fence_1.bmp");
 	fence_2.LoadBMP("Photos/fence_2.bmp");
 	//fence_3.LoadBMP("fence_3.bmp");
-    //fence_4.LoadBMP("fence_4.bmp");
-	
+	//fence_4.LoadBMP("fence_4.bmp");
+
 	fence->Materials[0].tex = fence_2;
-    fence->Materials[1].tex = fence_2;
+	fence->Materials[1].tex = fence_2;
 	fence->Materials[2].tex = fence_2;
 	fence->Materials[3].tex = fence_2;
-	
+
 	Wood_Bench = new Model_3DS();
 	Wood_Bench->Load("Models\\Park\\Wood_Bench.3ds");
 
@@ -242,7 +245,7 @@ void ModelLoading() {
 	House = new Model_3DS();
 	House->Load("House.3ds");
 
-	GLTexture Roof,Wall_1,Wall_2;
+	GLTexture Roof, Wall_1, Wall_2;
 	Roof.LoadBMP("roof.bmp");
 	Wall_1.LoadBMP("wall.bmp");
 	Wall_2.LoadBMP("wall1.bmp");
@@ -256,7 +259,7 @@ void ModelLoading() {
 	House->Materials[6].tex = Wall_1;
 	House->Materials[7].tex = Wall_2;
 	House->Materials[8].tex = BARK;
- 
+
 }
 
 
@@ -274,14 +277,14 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 
 
 	// sunglight
-	glLightfv(GL_LIGHT0, GL_AMBIENT, sunLightAmbient); 
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, sunLightDiffuse); 
-	glLightfv(GL_LIGHT0, GL_POSITION, sunLightPosition); 
-	glEnable(GL_LIGHT0); 
+	glLightfv(GL_LIGHT0, GL_AMBIENT, sunLightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, sunLightDiffuse);
+	glLightfv(GL_LIGHT0, GL_POSITION, sunLightPosition);
+	glEnable(GL_LIGHT0);
 
 	// moonlight
 	glLightfv(GL_LIGHT1, GL_AMBIENT, moonLightAmbient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, moonLightDiffuse);	
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, moonLightDiffuse);
 	glLightfv(GL_LIGHT1, GL_POSITION, moonLightPosition);
 	glDisable(GL_LIGHT1);  // disable moonlight by default
 
@@ -291,11 +294,11 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 	glFogi(GL_FOG_MODE, GL_EXP);
 	glFogfv(GL_FOG_COLOR, fogColor);
 
-	glFogf(GL_FOG_DENSITY, 0.05f); 
+	glFogf(GL_FOG_DENSITY, 0.05f);
 	glHint(GL_FOG_HINT, GL_NICEST);
 
-	glFogf(GL_FOG_START, 1.0f); 
-	glFogf(GL_FOG_END, 5.0f); 
+	glFogf(GL_FOG_START, 1.0f);
+	glFogf(GL_FOG_END, 5.0f);
 
 
 	TextureLoading();
@@ -311,23 +314,23 @@ void processInput()
 	// camera
 	if (keys['A'])
 	{
-        camera.ProcessKeyboard(LEFT, deltaTime);
+		camera.ProcessKeyboard(LEFT, deltaTime);
 	}
 	if (keys['D'])
 	{
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
 	if (keys['S'])
 	{
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 	if (keys['W'])
 	{
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+		camera.ProcessKeyboard(FORWARD, deltaTime);
 	}
 
 	// lighting 
-	if (keys['L']) 
+	if (keys['L'])
 	{
 		if (!darkMode) {
 			glEnable(GL_LIGHT1);
@@ -343,13 +346,13 @@ void processInput()
 	}
 
 	// different camera angle
-	if (keys['I']) 
+	if (keys['I'])
 	{
 		glLoadMatrixf(glm::value_ptr(camera2.GetViewMatrix()));
 	}
 
 	// fog
-	if (keys['F']) 
+	if (keys['F'])
 	{
 		if (!fog) {
 			glEnable(GL_FOG); // Enables GL_FOG
@@ -479,7 +482,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
-	glNormal3f( 0.0f, 0.0f, -1.0f); 
+	glNormal3f(0.0f, 0.0f, -1.0f);
 	glTexCoord2f(1, 1);
 	glVertex3f(size, size, -size);
 
@@ -493,13 +496,13 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glVertex3f(size, -size, -size);
 	glEnd();
 
-	
-	
+
+
 	//back face
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
-	glNormal3f( 0.0f, 0.0f, 1.0f); 
+	glNormal3f(0.0f, 0.0f, 1.0f);
 	glTexCoord2f(0, 0);
 	glVertex3f(size, -size, size);
 
@@ -513,13 +516,13 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glVertex3f(size, size, size);
 	glEnd();
 
-	
-	
+
+
 	//left face
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
-	glNormal3f( -1.0f, 0.0f, 0.0f); 
+	glNormal3f(-1.0f, 0.0f, 0.0f);
 	glTexCoord2f(0, 0);
 	glVertex3f(-size, -size, size);
 
@@ -533,14 +536,14 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glVertex3f(-size, size, size);
 	glEnd();
 
-	
 
-	
+
+
 	//right face
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
-	glNormal3f( 1.0f, 0.0f, 0.0f); 
+	glNormal3f(1.0f, 0.0f, 0.0f);
 	glTexCoord2f(0, 0);
 	glVertex3f(size, -size, -size);
 
@@ -555,12 +558,12 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glEnd();
 
 
-	
+
 	//Top face
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
-	glNormal3f( 0.0f, 1.0f, 0.0f); 
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glTexCoord2f(1, 0);
 	glVertex3f(size, size, size);
 
@@ -570,7 +573,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glTexCoord2f(0, 1);
 	glVertex3f(-size, size, -size);
 
-	glTexCoord2f(1 ,1);
+	glTexCoord2f(1, 1);
 	glVertex3f(size, size, -size);
 	glEnd();
 
@@ -580,7 +583,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
-	glNormal3f( 0.0f, -1.0f, 0.0f); 
+	glNormal3f(0.0f, -1.0f, 0.0f);
 	glTexCoord2f(0, 1);
 	glVertex3f(size, -size, size);
 
@@ -602,7 +605,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 void Road2(float x1, float z1, float x2, float z2, int Texture) {
 
 	glBindTexture(GL_TEXTURE_2D, Texture);
-	
+
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0, 10);
@@ -739,119 +742,86 @@ void Wall(float size, float sx, float sy, float sz, float alpha, int texture, GL
 void Mal() {
 	glPushMatrix();
 	glTranslatef(-13, 0, 14);
-	//glScalef(1.5, 1.5, 1.5);
-	//////////////////////////////////////////////////right market
-	glPushMatrix();
-	glTranslatef(-16, 0, -5);
-	for (GLfloat i = 0; i <= 12; i += 4) {
-		glPushMatrix();
-		glTranslatef(i, 0, 0);
-		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
-		glPopMatrix();
-	}
-	glPopMatrix();
 
-	glPushMatrix();
-	glTranslatef(-16, 0, 5);
-	for (GLfloat i = 0; i <= 12; i += 4) {
-		glPushMatrix();
-		glTranslatef(i, 0, 0);
-		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
-		glPopMatrix();
-	}
-	glPopMatrix();
-	///////////////////////////////////////////////////// left market
-	glPushMatrix();
-	glTranslatef(16, 0, -5);
-	for (GLfloat i = 0; i <= 12; i += 4) {
-		glPushMatrix();
-		glTranslatef(-i, 0, 0);
-		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
-		glPopMatrix();
-	}
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(16, 0, 5);
-	for (GLfloat i = 0; i <= 12; i += 4) {
-		glPushMatrix();
-		glTranslatef(-i, 0, 0);
-		Wall(1.0f, 3.0f, 3.0f, 0.2f, 90, blackwall, 1);
-		glPopMatrix();
-	}
-	glPopMatrix();
-
-
-
-
+	allmarkets();
 
 	glPushMatrix();                          //down wall
-	glTranslatef(0.0f, -15.2f, 7.0f);
+	glTranslatef(0.0f, -15.3f, 5.0f);
 	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-	Wall(1.0f, 20.0f, 8.0f, 0.2f, 0.0f, whitewall, 5.0f);
+	Wall(1.0f, 20.2f, 10.2f, 0.2f, 0.0f, whitewall, 5.0f);
 	glPopMatrix();
 
 	glPushMatrix();                             // up wall 2
-	glTranslatef(0.0f, -3.2f, 7.0f);
+	glTranslatef(0.0f, -5.2f, 5.0f);
 	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-	Wall(1.0f, 20.0f, 8.0f, 0.2f, 0.0f, blackwall, 5.0f);
+	Wall(1.0f, 20.0f, 10.0f, 0.2f, 0.0f, blackwall, 5.0f);
 	glPopMatrix();
 
 	glPushMatrix();                             // up wall 1
-	glTranslatef(0.0f, -9.2f, 7.0f);
+	glTranslatef(0.0f, -10.2f, 5.0f);
 	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-	Wall(1.0f, 20.0f, 8.0f, 0.2f, 0.0f, blackwall, 5.0f);
+	Wall(1.0f, 20.0f, 10.0f, 0.2f, 0.0f, blackwall, 5.0f);
 	glPopMatrix();
 
+
+
 	glPushMatrix();                                 //front wall
-	glTranslatef(0.0f, 0.0f, 8.0f);
-	Wall(1.0f, 20.0f, 6.0f, 0.2f, 0.0f, tranwall, 5.0f);
+	glTranslatef(0.0f, 0.0f, 10.0f);
+	Wall(1.0f, 20.0f, 5.0f, 0.2f, 0.0f, tranwall, 5.0f);
 	glPopMatrix();
 
 
 	glPushMatrix();                                 //right wall
 	glTranslatef(-20.0f, 0.0f, 0.0f);
-	Wall(1.0f, 8.0f, 6.0f, 0.2f, 90.0f, tranwall, 5.0f);
+	Wall(1.0f, 10.0f, 5.2f, 0.2f, 90.0f, tranwall, 5.0f);
 	glPopMatrix();
 
 
 	glPushMatrix();                                    //left wall
 	glTranslatef(+20.0f, 0.0f, 0.0f);
-	Wall(1.0f, 8.0f, 6.0f, 0.2f, 90.0f, tranwall, 5.0f);
+	Wall(1.0f, 10.0f, 5.2f, 0.2f, 90.0f, tranwall, 5.0f);
 	glPopMatrix();
 
 
-	//glPushMatrix();                                   //back wall
-	glTranslatef(0.0f, 0.0f, -8.0f);
-	// 
-	//glPushMatrix();                                   //right back wall
-	//glTranslatef(-11.7,0,0);
-	//Wall(1.0, 8.5, 6.0, 0.2, 0, redwall,5);
-	//glPopMatrix();
-	//
+	glTranslatef(0.0f, 0.0f, -10.0f);
+
+	glEnable(GL_BLEND);
+	glColor4f(1.0, 1.0, 1.0, 0.5);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glPushMatrix();                                   //right back wall
+	glTranslatef(-11.7, 0, 0);
+	Wall(1.0, 8.5, 5.0, 0.2, 0, redwall, 5);
+	glPopMatrix();
+	glDisable(GL_BLEND);
+
 	glPushMatrix();                                   //right column
-	glTranslatef(-3.0f ,0.0f ,0.0f);
-	Wall(1.0f, 1.5f, 7.0f, 1.0f, 0.0f, tranwall,5.0f);
+	glTranslatef(-3.0f, 0.0f, 0.0f);
+	Wall(1.0f, 1.5f, 6.0f, 1.0f, 0.0f, tranwall, 5.0f);
 	glPopMatrix();
-	
+
 	glPushMatrix();                                  //left column
 	glTranslatef(+3.0f, 0.0f, 0.0f);
-	Wall(1.0f, 1.5f, 7.0f, 1.0f, 0.0f, tranwall, 5.0f);
+	Wall(1.0f, 1.5f, 6.0f, 1.0f, 0.0f, tranwall, 5.0f);
 	glPopMatrix();
-	//
-	//
-	//glPushMatrix();                                  //left back wall
-	//glTranslatef(+11.7, 0, 0);
-	//Wall(1.0, 8.5, 6.0, 0.2, 0, redwall,5);
-	//glPopMatrix();
-	//
-	//glPopMatrix();                                  //finall -8
+
+
+	glEnable(GL_BLEND);
+	glColor4f(1.0, 1.0, 1.0, 0.5);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glPushMatrix();                                  //left back wall
+	glTranslatef(+11.7, 0, 0);
+	Wall(1.0, 8.5, 5.0, 0.2, 0, redwall, 5);
+	glPopMatrix();
+
+	glDisable(GL_BLEND);
 
 	//road of mal
 	glPushMatrix();
-	glTranslatef(-0.5f, 0.0f, -23.0f);
-	Road(2.0f, 15.0f, mallRoad);
+	glTranslatef(0.0f, 0.0f, -13.0f);
+	Road(1.5f, 13.0f, mallRoad);
 	glPopMatrix();
+	glPopMatrix();                                  //finall -8
+
 	/*
 	glPushMatrix();
 	glTranslatef(+16.5, 0.1, -15.5);
@@ -867,7 +837,7 @@ void Mal() {
 	glPopMatrix();                                     //finall
 }
 
-void Land(float x1, float z1, float x2, float z2,int Texture,GLfloat n) {
+void Land(float x1, float z1, float x2, float z2, int Texture, GLfloat n) {
 
 	glBindTexture(GL_TEXTURE_2D, Texture);
 	//glScalef(x, 1, z);
@@ -894,7 +864,7 @@ void Land(float x1, float z1, float x2, float z2,int Texture,GLfloat n) {
 void CreatModel(Model_3DS *Model, float x, float y, float z, float scale)
 {
 	Model->pos.x = x;
-	Model->pos.y = LandSize-y;
+	Model->pos.y = LandSize - y;
 	Model->pos.z = z;
 	Model->scale = scale;
 	Model->Draw();
@@ -908,7 +878,7 @@ void Buildings() {
 	build(BuildSize, 75.0f, 25.0f, 1.0f, 4.5f, 1.0f, Building_1[0]);
 	build(BuildSize, 85.0f, 30.0f, 3.0f, 6.1f, 2.0f, Building_1[1]);
 	build(BuildSize, 75.0f, 35.0f, 1.0f, 3.4f, 2.0f, Building_1[3]);
-    
+
 	build(BuildSize, 82.0f, 60.0f, 2.0f, 4.1f, 1.0f, Building_1[4]);
 	build(BuildSize, 74.0f, 70.0f, 2.0f, 7.2f, 2.0f, Building_1[5]);
 	build(BuildSize, 80.0f, 90.0f, 2.0f, 5.5f, 1.0f, Building_1[1]);
@@ -921,58 +891,58 @@ void Park()
 	glPushMatrix();
 	glTranslated(-13, 0, -29);
 
-	
 
-	CreatModel(SLIDING_ZOOLA, -30, -2, -10	, 0.5);
+
+	CreatModel(SLIDING_ZOOLA, -30, -2, -10, 0.5);
 	CreatModel(city_stall, -5.0f, 0.0f, -1.0f, 0.01f);
 
-    for (GLfloat i = 4; i <	20; i += 4)
-       CreatModel(TreeModel, -3.0f, 0.0f, i, 0.04f);
+	for (GLfloat i = 4; i < 20; i += 4)
+		CreatModel(TreeModel, -3.0f, 0.0f, i, 0.04f);
 
 	for (GLfloat i = 4; i < 20; i += 4)
 		CreatModel(TreeModel, 3.0f, 0.0f, i, 0.04f);
-	
+
 	for (GLfloat i = -5; i > -35; i -= 4)
 		CreatModel(TreeModel, i, 0.0f, 16.0f, 0.1f);
 
-	for (GLfloat i = 5; i<30; i += 4)
+	for (GLfloat i = 5; i < 30; i += 4)
 		CreatModel(TreeModel, i, 0.0f, 16.0f, 0.1f);
 
 	for (GLfloat i = 5; i<26; i += 4)
 		CreatModel(TreeModel, i, 0.0f, -19.0f, 0.1f);
-	
 
-	for (GLfloat i = -4 ; i>-33; i -= 4)
+
+	for (GLfloat i = -4; i>-33; i -= 4)
 		CreatModel(TreeModel, i, 0.0f, -19.0f, 0.1f);
 
-	Land(-37,-21,33,18,ParkLand,30);
-	
-	for(GLfloat i = -33.5 ; i<-7 ; i+=6.5)
-    CreatModel(fence, i, 0.0f, 17.0f, 0.04f);
+	Land(-37, -21, 33, 18, ParkLand, 30);
+
+	for (GLfloat i = -33.5; i < -7; i += 6.5)
+		CreatModel(fence, i, 0.0f, 17.0f, 0.04f);
 
 
-	for (GLfloat i = 27.5; i>2; i -= 6.5)
+	for (GLfloat i = 27.5; i > 2; i -= 6.5)
 		CreatModel(fence, i, 0.0f, 17.0f, 0.04f);
 
 
 	CreatModel(grass_block, 30.0f, -0.2f, 17.0f, 0.04f);
 
-	CreatModel(grass_block,  2.2f, -0.2f, 17.0f, 0.04f);
+	CreatModel(grass_block, 2.2f, -0.2f, 17.0f, 0.04f);
 	CreatModel(grass_block, -3.2f, -0.2f, 17.0f, 0.04f);
 
 	Road2(-2.5, -21, 1.5, 18, Sidewalk);
 
-	
+
 	for (GLfloat i = -34; i < -4; i += 8)
 	{
 		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
-		CreatModel(TreeModel,  i, 0.0f, -3.0f,  0.05f);
+		CreatModel(TreeModel, i, 0.0f, -3.0f, 0.05f);
 
 	}
 	for (GLfloat i = 4; i < 34; i += 8)
 	{
 		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
-		CreatModel(TreeModel,  i, 0.0f, -3.0f, 0.05f);
+		CreatModel(TreeModel, i, 0.0f, -3.0f, 0.05f);
 	}
 	glPushMatrix();
 	glRotated(180.0f, 0.0f, 1.0f, 0.0f);
@@ -980,7 +950,7 @@ void Park()
 	for (GLfloat i = 12; i < 34; i += 8)
 	{
 		CreatModel(Wood_Bench, i, 0.3f, -1.0f, 0.005f);
-		CreatModel(TreeModel,  i, 0.0f, -3.0f, 0.05f);
+		CreatModel(TreeModel, i, 0.0f, -3.0f, 0.05f);
 	}
 	for (GLfloat i = -10; i > -30; i -= 8)
 	{
@@ -990,22 +960,22 @@ void Park()
 	glPopMatrix();
 	glPushMatrix();
 	glRotated(90.0f, 0.0f, 1.0f, 0.0f);
-	
 
-    for (GLfloat i = -14; i < 21; i += 8)
-    	CreatModel(TreeModel, i, 0.0f, 30.0f, 0.10f);
-	
 
-	for (GLfloat i = -14; i<21; i += 6.5)
+	for (GLfloat i = -14; i < 21; i += 8)
+		CreatModel(TreeModel, i, 0.0f, 30.0f, 0.10f);
+
+
+	for (GLfloat i = -14; i < 21; i += 6.5)
 		CreatModel(fence, i, 0.0f, 31.0f, 0.04f);
-	
-	 for (GLfloat i = 5; i < 30; i += 4)
-		CreatModel(TreeModel, i, 0.0f, -36.0f, 0.1f);
-	
 
-     for (GLfloat i = -4; i > -15; i -= 4)
-     		CreatModel(TreeModel, i, 0.0f, -36.0f, 0.10f);
-	
+	for (GLfloat i = 5; i < 30; i += 4)
+		CreatModel(TreeModel, i, 0.0f, -36.0f, 0.1f);
+
+
+	for (GLfloat i = -4; i > -15; i -= 4)
+		CreatModel(TreeModel, i, 0.0f, -36.0f, 0.10f);
+
 	Road2(-2, -37, 2, -2.5, Sidewalk);
 	Road2(-2, 1.5, 2, 31, Sidewalk);
 
@@ -1032,11 +1002,11 @@ void Park()
 
 }
 
-void SecondLandDraw() 
+void SecondLandDraw()
 {
 
-	Land(20, -50, 50, 50, Sidewalk,30);
-	CreatModel(House, 35, 0,-40, 1);
+	Land(20, -50, 50, 50, Sidewalk, 30);
+	CreatModel(House, 35, 0, -40, 1);
 
 	Buildings();
 
@@ -1061,26 +1031,27 @@ void DrawGLScene(GLvoid)								   	// Here's Where We Do All The Drawing
 	processInput();
 	// Camera
 
-	
+
 	inParkShape();
 
-	for (GLfloat i = 47 ; i>-50; i -= 2)
+	for (GLfloat i = 47; i > -50; i -= 2)
 		CreatModel(Street_Model, 20.0f, 0.0f, i, 0.5f);
 
 	glPushMatrix();
-		glRotated(90.0f, 0.0f, 1.0f, 0.0f);
-		glTranslated(0.0f, 0.0f, 0.8f);
-		for (GLfloat i = 16; i>-49; i -= 2)
-			CreatModel(Street_Model, 10.0f, 0.0f ,i, 0.5f);
+	glRotated(90.0f, 0.0f, 1.0f, 0.0f);
+	glTranslated(0.0f, 0.0f, 0.8f);
+	for (GLfloat i = 16; i > -49; i -= 2)
+		CreatModel(Street_Model, 10.0f, 0.0f, i, 0.5f);
 	glPopMatrix();
-	
+
 	Skybox(Size);
 
-	Land(-Size,-Size , +Size, +Size, downLand,30);
+	Land(-Size, -Size, +Size, +Size, downLand, 30);
 	SecondLandDraw();
 
 	Park();
 	Mal();
+	//allmarkets();
 
 
 	SwapBuffers(hDC);	//DO NOT REMOVE THIS
@@ -1410,38 +1381,38 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 
 void mouse_callback(GLfloat xpos, GLfloat ypos)
 {
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
 
-    float xoffset = (xpos - lastX) * 7;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	float xoffset = (xpos - lastX) * 7;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-    lastX = xpos;
-    lastY = ypos;
+	lastX = xpos;
+	lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLfloat xoffset, GLfloat yoffset)
 {
-    camera.ProcessMouseScroll(yoffset);
+	camera.ProcessMouseScroll(yoffset);
 }
 
 void inParkShape() {
 
-	GLUquadric* quadratic = gluNewQuadric();	
-	gluQuadricNormals(quadratic, GLU_SMOOTH);		
+	GLUquadric* quadratic = gluNewQuadric();
+	gluQuadricNormals(quadratic, GLU_SMOOTH);
 	gluQuadricTexture(quadratic, GL_TRUE);
 
 	glEnable(GL_TEXTURE_GEN_S);
 	glEnable(GL_TEXTURE_GEN_T);
 
 	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP); 
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 
 
 	glBindTexture(GL_TEXTURE_2D, reflectedTex); // This Will Select A Sphere Map
@@ -1457,5 +1428,67 @@ void inParkShape() {
 
 	glPopMatrix();
 
+}
+
+void market(float x, float z, float r) {
+
+	glPushMatrix();
+	glTranslatef(x, 0, z);
+
+	for (int i = 0; i < 10.6; i += 5.3) {
+		glPushMatrix();
+		glTranslatef(i, 0, 0);
+		glRotatef(r, 0, 1, 0);
+
+		glPushMatrix();
+		glTranslatef(0.1f, 0, 0);
+		Wall(1.0, 3.0, 2.5, 0.2, 90, blackwall, 1);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(5.3f, 0, 0);
+		Wall(1.0, 3.0, 2.5, 0.2, 90, blackwall, 1);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(2.65, 0.0, 3.0);
+		Wall(1.0, 2.65, 2.5, 0.1, 0, blackwall, 1);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(1, 0.0, -3.0);
+		Wall(1.0, 1.0, 2.5, 0.1, 0, blackwall, 3);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(4.3, 0.0, -3.0);
+		Wall(1.0, 1.0, 2.5, 0.1, 0, blackwall, 3);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(2.65, 2.6, -3.0);
+		Wall(1.0, 1.0, 1.0, 0.1, 0, blackwall, 1);
+		glPopMatrix();
+
+		glPopMatrix();
+
+	}
+	glPopMatrix();
+
+}
+void allmarkets() {
+	glPushMatrix();
+	glTranslatef(5.5, 0, 0);
+	market(-20.0, -7.0, 180);
+	glPopMatrix();
+
+	market(-20.0, +7.0, 0);
+
+	glPushMatrix();
+	glTranslatef(6.0, 0, 0);
+	market(3.9, -7.0, 180);
+	glPopMatrix();
+
+	market(3.9, +7.0, 0);
 }
 

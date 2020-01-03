@@ -1,1 +1,21 @@
-﻿  Test.vcxproj -> C:\Users\Yazan\Desktop\graphics_project\Debug\Test.exe
+﻿  Source.cpp
+c:\users\yazan\desktop\graphics_project\test\source.cpp(51): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+c:\users\yazan\desktop\graphics_project\test\source.cpp(792): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(793): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(812): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(813): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1220): warning C4838: conversion from 'int' to 'BYTE' requires a narrowing conversion
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1438): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1440): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1445): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1450): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1454): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1455): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1460): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1464): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1465): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1469): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1470): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1489): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\yazan\desktop\graphics_project\test\source.cpp(1492): warning C4305: 'argument': truncation from 'double' to 'float'
+  Test.vcxproj -> C:\Users\Yazan\Desktop\graphics_project\Debug\Test.exe
