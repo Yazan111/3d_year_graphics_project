@@ -1,4 +1,1 @@
-﻿  Source.cpp
-c:\users\yazan\desktop\graphics_project\test\source.cpp(47): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-c:\users\yazan\desktop\graphics_project\test\source.cpp(1221): warning C4838: conversion from 'int' to 'BYTE' requires a narrowing conversion
-  Test.vcxproj -> C:\Users\Yazan\Desktop\graphics_project\Debug\Test.exe
+﻿  Test.vcxproj -> C:\Users\Yazan\Desktop\graphics_project\Debug\Test.exe

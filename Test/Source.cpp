@@ -17,6 +17,7 @@ void Road2(float x1, float z1, float x2, float z2, int Texture);
 void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GLfloat Depth, int texture);
 void Skybox(GLfloat size);
 void scroll_callback(GLfloat xoffset, GLfloat yoffset);
+void inParkShape();
 
 void ModelLoading();
 void TextureLoading();
@@ -78,6 +79,7 @@ int  back;
 int  down;
 int  right;
 int  left;
+int reflectedTex;
 
 int  tranwall;
 int  yellowwall;
@@ -108,22 +110,30 @@ Model_3DS *grass_block;
 Model_3DS *House; 
 Model_3DS *House_1;
 
-// sun light
-GLfloat sunLightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f }; 
-GLfloat sunLightPosition[]= { 0.0f, LandSize + 20.0f, 2.0f, 1.0f }; 
+// moonlight
+GLfloat moonLightAmbient[]= { 0.3f, 0.3f, 0.3f, 1.0f }; 
+GLfloat moonLightDiffuse[]= { 0.3f, 0.3f, 0.3f, 1.0f }; 
+GLfloat moonLightPosition[]= { 0.0f, LandSize + 20.0f, 2.0f, 1.0f }; 
 GLboolean darkMode = false;
+
+// sunlight
+float downToTop;
+GLfloat sunLightAmbient[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
+GLfloat sunLightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 
+GLfloat sunLightPosition[]= { 1.0f, LandSize + 55.0f, 0.0f, 8.0f }; 
 
 // for fog 
 GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f}; // Fog Color
 GLboolean fog = false;
 
 void TextureLoading() { //Skybox
-	front = LoadTexture((char*)"Photos\\SkyBoxLand\\front.bmp");
-	back = LoadTexture((char*)"Photos\\SkyBoxLand\\back.bmp");
-	top = LoadTexture((char*)"Photos\\SkyBoxLand\\top.bmp");
-	down = LoadTexture((char*)"Photos\\SkyBoxLand\\down.bmp");
-	right = LoadTexture((char*)"Photos\\SkyBoxLand\\right.bmp");
-	left = LoadTexture((char*)"Photos\\SkyBoxLand\\left.bmp");
+	front = LoadTexture((char*)"Photos\\SkyBoxLand\\pz.png");
+	back = LoadTexture((char*)"Photos\\SkyBoxLand\\nz.png");
+	top = LoadTexture((char*)"Photos\\SkyBoxLand\\py.png");
+	down = LoadTexture((char*)"Photos\\SkyBoxLand\\ny.png");
+	right = LoadTexture((char*)"Photos\\SkyBoxLand\\nx.png");
+	left = LoadTexture((char*)"Photos\\SkyBoxLand\\px.png");
+	reflectedTex = LoadTexture((char*)"Photos\\SkyBoxLand\\reflected.png");
 
 	Building_1[0] = LoadTexture((char*)"Photos/Build/building_type_1.jpg");
 	Building_1[1] = LoadTexture((char*)"Photos/Build/building_type_2.jpg");
@@ -250,43 +260,51 @@ void ModelLoading() {
 }
 
 
+
 int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 {
 	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 	glClearColor(1, 1, 1.0f, 0.5f);				        // Black Background
 	glClearDepth(1.0f);									// Depth Buffer Setup
 	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
+	glEnable(GL_TEXTURE_2D);
 	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
 														//our Enable
 
 
 	// sunglight
-	glLightfv(GL_LIGHT1, GL_AMBIENT, sunLightAmbient); 
-	glLightfv(GL_LIGHT1, GL_POSITION, sunLightPosition); 
-	glEnable(GL_LIGHT1); 
-	// sunglight
+	glLightfv(GL_LIGHT0, GL_AMBIENT, sunLightAmbient); 
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, sunLightDiffuse); 
+	glLightfv(GL_LIGHT0, GL_POSITION, sunLightPosition); 
+	glEnable(GL_LIGHT0); 
+
+	// moonlight
+	glLightfv(GL_LIGHT1, GL_AMBIENT, moonLightAmbient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, moonLightDiffuse);	
+	glLightfv(GL_LIGHT1, GL_POSITION, moonLightPosition);
+	glDisable(GL_LIGHT1);  // disable moonlight by default
+
+	glEnable(GL_LIGHTING);
 
 	// fog
 	glFogi(GL_FOG_MODE, GL_EXP);
 	glFogfv(GL_FOG_COLOR, fogColor);
 
 	glFogf(GL_FOG_DENSITY, 0.05f); 
-	glHint(GL_FOG_HINT, GL_DONT_CARE);
+	glHint(GL_FOG_HINT, GL_NICEST);
 
 	glFogf(GL_FOG_START, 1.0f); 
 	glFogf(GL_FOG_END, 5.0f); 
-	// fog
 
-	glEnable(GL_TEXTURE_2D);
+
 	TextureLoading();
 	ModelLoading();
 	return TRUE;									    	// Initialization Went OK
 }
 
+
 //For Camera
-
-
 void processInput()
 {
 
@@ -312,12 +330,14 @@ void processInput()
 	if (keys['L']) 
 	{
 		if (!darkMode) {
-			glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHT1);
+			glDisable(GL_LIGHT0);
 			darkMode = true;
 		}
 
 		else {
-			glDisable(GL_LIGHTING);
+			glEnable(GL_LIGHT0);
+			glDisable(GL_LIGHT1);
 			darkMode = false;
 		}
 	}
@@ -344,10 +364,13 @@ void processInput()
 
 }
 void Skybox(GLfloat size) {
-	glColor3d(1, 1, 1);
+
 	glBindTexture(GL_TEXTURE_2D, back);
-	glBegin(GL_QUADS);
+
 	//back face
+
+	glNormal3f(0.0f, 0.0f, -0.5f);
+	glBegin(GL_QUADS);
 	glTexCoord2f(1, 0);
 	glVertex3f(size, -size, size);
 
@@ -363,6 +386,7 @@ void Skybox(GLfloat size) {
 
 	//left face
 
+	glNormal3f(0.5f, 0.0f, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, left);
 	glBegin(GL_QUADS);
 	glTexCoord2f(1, 0);
@@ -378,6 +402,8 @@ void Skybox(GLfloat size) {
 
 	//front face
 
+	glNormal3f(0.0f, 0.0f, 0.5f);
+	glBindTexture(GL_TEXTURE_2D, left);
 	glBindTexture(GL_TEXTURE_2D, front);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 1);
@@ -391,6 +417,7 @@ void Skybox(GLfloat size) {
 	glEnd();
 
 	//right face
+	glNormal3f(-0.5f, 0.0f, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, right);
 	glBegin(GL_QUADS);
 	glTexCoord2f(1, 0);
@@ -406,6 +433,7 @@ void Skybox(GLfloat size) {
 
 	//top face
 
+	glNormal3f(0.0f, -0.5f, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, top);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 0);
@@ -421,6 +449,7 @@ void Skybox(GLfloat size) {
 
 	//DOWN face
 
+	glNormal3f(0.0f, 0.5f, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, down);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 1);
@@ -432,7 +461,6 @@ void Skybox(GLfloat size) {
 	glTexCoord2f(1, 1);
 	glVertex3f(size, -size, -size);
 	glEnd();
-	glEnable(GL_DEPTH_TEST);
 
 }
 
@@ -443,8 +471,7 @@ void build(GLfloat size, GLfloat x, GLfloat z, GLfloat width, GLfloat length, GL
 
 	glPushMatrix();
 
-	glTranslated(size * width - Size + x, LandSize + size * length, size*Depth - Size + z);
-
+	glTranslated(size * width - Size + x, LandSize + size * length, size * Depth - Size + z);
 	glScaled(width, length, Depth);
 
 
@@ -883,7 +910,7 @@ void Buildings() {
 	build(BuildSize, 75.0f, 35.0f, 1.0f, 3.4f, 2.0f, Building_1[3]);
     
 	build(BuildSize, 82.0f, 60.0f, 2.0f, 4.1f, 1.0f, Building_1[4]);
-	build(BuildSize, 78.0f, 70.0f, 2.0f, 7.2f, 2.0f, Building_1[5]);
+	build(BuildSize, 74.0f, 70.0f, 2.0f, 7.2f, 2.0f, Building_1[5]);
 	build(BuildSize, 80.0f, 90.0f, 2.0f, 5.5f, 1.0f, Building_1[1]);
 
 }
@@ -897,7 +924,6 @@ void Park()
 	
 
 	CreatModel(SLIDING_ZOOLA, -30, -2, -10	, 0.5);
-	
 	CreatModel(city_stall, -5.0f, 0.0f, -1.0f, 0.01f);
 
     for (GLfloat i = 4; i <	20; i += 4)
@@ -1035,6 +1061,8 @@ void DrawGLScene(GLvoid)								   	// Here's Where We Do All The Drawing
 	processInput();
 	// Camera
 
+	
+	inParkShape();
 
 	for (GLfloat i = 47 ; i>-50; i -= 2)
 		CreatModel(Street_Model, 20.0f, 0.0f, i, 0.5f);
@@ -1402,3 +1430,32 @@ void scroll_callback(GLfloat xoffset, GLfloat yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }
+
+void inParkShape() {
+
+	GLUquadric* quadratic = gluNewQuadric();	
+	gluQuadricNormals(quadratic, GLU_SMOOTH);		
+	gluQuadricTexture(quadratic, GL_TRUE);
+
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+
+	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP); 
+
+
+	glBindTexture(GL_TEXTURE_2D, reflectedTex); // This Will Select A Sphere Map
+
+	glPushMatrix();
+	glTranslated(-13, LandSize + 2, -29);
+	glRotatef(90, 1.0f, 0.0f, 0.0f);
+
+	gluSphere(quadratic, 1.3f, 32, 32);
+
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+
+	glPopMatrix();
+
+}
+
